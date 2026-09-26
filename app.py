@@ -7,18 +7,18 @@ def get_my_ip():
     # 1. Check for standard proxy header chain
     forwarded = request.headers.get('X-Forwarded-For')
     if forwarded:
-        # Safely split by comma and isolate the first item
         ip_list = [ip.strip() for ip in forwarded.split(',')]
         if ip_list:
-            return f"Your IP Address is: {ip_list[0]}"
+            # Returns just the raw IP number string
+            return f"{ip_list[0]}"
             
     # 2. Check for alternative real IP headers
     real_ip = request.headers.get('X-Real-IP')
     if real_ip:
-        return f"Your IP Address is: {real_ip.strip()}"
+        return f"{real_ip.strip()}"
 
     # 3. Fallback to basic remote connection address
-    return f"Your IP Address is: {request.remote_addr}"
+    return f"{request.remote_addr}"
 
 if __name__ == '__main__':
     import os
