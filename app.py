@@ -4,8 +4,10 @@ app = Flask(__name__)
 
 @app.route('/')
 def get_my_ip():
-    # Checks the cloud forwarding header first, then falls back to local network
-    user_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
+    # Grabs the cloud forwarding header chain safely
+    raw_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
+    # Splits the list by the comma, takes the 1st value [0], and cleans spaces
+    user_ip = raw_ip.split(',')[0].strip()
     return f"Your IP Address is: {user_ip}"
 
 if __name__ == '__main__':
