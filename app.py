@@ -4,11 +4,21 @@ app = Flask(__name__)
 
 @app.route('/')
 def get_my_ip():
-    # Grabs the cloud forwarding header chain safely
-    raw_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
-    # Splits the list by the comma, takes the 1st value [0], and cleans spaces
-    user_ip = raw_ip.split(',')[0].strip()
-    return f"Your IP Address is: {user_ip}"
+    # 1. Check for standard proxy header chain
+    forwarded = request.headers.get('X-Forwarded-For')
+    if forwarded:
+        # Safely split by comma and isolate the first item
+        ip_list = [ip.strip() for ip in forwarded.split(',')]
+        if ip_list:
+            return f"Your IP Address is: {ip_list[0]}"
+            
+    # 2. Check for alternative real IP headers
+    real_ip = request.headers.get('X-Real-IP')
+    if real_ip:
+        return f"Your IP Address is: {real_ip.strip()}"
+
+    # 3. Fallback to basic remote connection address
+    return f"Your IP Address is: {request.remote_addr}"
 
 if __name__ == '__main__':
     import os
